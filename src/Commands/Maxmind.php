@@ -90,7 +90,8 @@ class Maxmind extends Command
         $progress->setMessage(0, 'currentsize');
         $progress->setMessage('???', 'totalsize');
         $progress->setFormat(
-            '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo <info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
+            '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
+            '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
         $progress->start();
 
@@ -233,7 +234,8 @@ class Maxmind extends Command
         $progress->setMessage(0, 'currentsize');
         $progress->setMessage(round($file['size'] / 1024 / 1024, 3), 'totalsize');
         $progress->setFormat(
-            '<comment>[%bar%]</comment> %currentsize:7s% mo/%totalsize:7s% mo <info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
+            '<comment>[%bar%]</comment> %currentsize:7s% mo/%totalsize:7s% mo ' .
+            '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
         if ($output->isVerbose()) {
             $progress->start();
@@ -301,7 +303,7 @@ class Maxmind extends Command
                     }
 
                     if (!empty($row[4]) && !empty($row[6]) && !empty($row[8])) {
-                        $this->langFile['subdivision'][$lang][$row[4]]['division2'][$row[6]][$row[8]] = $row[9]  ?: null;
+                        $this->langFile['subdivision'][$lang][$row[4]]['division2'][$row[6]][$row[8]] = $row[9] ?: null;
                     }
                 }
             }
@@ -370,7 +372,8 @@ class Maxmind extends Command
         $progress->setMessage(0, 'currentsize');
         $progress->setMessage($insertTotal, 'totalsize');
         $progress->setFormat(
-            '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo <info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
+            '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
+            '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
         if ($output->isVerbose()) {
             $progress->start();
