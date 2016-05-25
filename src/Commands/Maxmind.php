@@ -35,8 +35,8 @@ class Maxmind extends Command
      */
     protected function configure()
     {
-        $this->setName('ip2location:load')
-            ->setDescription('Load ip2location lite database')
+        $this->setName('maxmind:load')
+            ->setDescription('Load maxmind lite database')
             ->addOption('db', 'd', InputOption::VALUE_REQUIRED, 'Database alias')
         ;
     }
@@ -313,8 +313,9 @@ class Maxmind extends Command
 
         if ($output->isVerbose()) {
             $progress->finish();
+            $output->write("\n");
         }
-        $output->write("\n");
+
 
         return true;
     }
@@ -396,8 +397,9 @@ class Maxmind extends Command
 
         if ($output->isVerbose()) {
             $progress->finish();
+            $output->write("\n");
         }
-        $output->write("\n");
+
 
         return true;
     }
