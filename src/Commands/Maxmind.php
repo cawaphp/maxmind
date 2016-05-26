@@ -316,7 +316,6 @@ class Maxmind extends Command
             $output->write("\n");
         }
 
-
         return true;
     }
 
@@ -399,7 +398,6 @@ class Maxmind extends Command
             $progress->finish();
             $output->write("\n");
         }
-
 
         return true;
     }
