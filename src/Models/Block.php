@@ -90,7 +90,7 @@ class Block extends Model
         $this->anonymousProxy = (bool) $result['block_anonymous_proxy'] ;
         $this->satelliteProvider = (bool) $result['block_satellite_provider'];
         $this->postalCode = $result['block_postal_code'];
-        $this->latitude = (double) $result['block_latitude'];
-        $this->longitude = (double) $result['block_longitude'];
+        $this->latitude = $result['block_latitude'];
+        $this->longitude = $result['block_longitude'];
     }
 }

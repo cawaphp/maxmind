@@ -126,13 +126,13 @@ class Location extends Model
      */
     public function map(array $result)
     {
-        $this->id = (int) $result['location_id'];
+        $this->id = $result['location_id'];
         $this->continent = $result['location_continent'];
         $this->country = $result['location_country'];
         $this->subdivition1 = $result['location_subdivision_1'];
         $this->subdivition2 = $result['location_subdivision_2'];
         $this->city = $result['location_city'];
-        $this->metro = (int) $result['location_metro'];
+        $this->metro = $result['location_metro'];
         $this->timezone = $result['location_timezone'];
     }
 }
