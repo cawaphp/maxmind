@@ -13,11 +13,11 @@ declare (strict_types=1);
 
 namespace Cawa\Maxmind\Commands;
 
+use Cawa\Console\Command;
 use Cawa\Db\DatabaseFactory;
 use Cawa\Db\TransactionDatabase;
 use Cawa\HttpClient\Adapter\AbstractClient;
 use Cawa\HttpClient\HttpClient;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -57,15 +57,15 @@ class Maxmind extends Command
 
         $db = self::db($db);
 
-        if (!($zipFile = $this->download($output))) {
+        if (!($zipFile = $this->download())) {
             return 1;
         }
 
-        if (!$this->normalize($output, $zipFile)) {
+        if (!$this->normalize($zipFile)) {
             return 1;
         }
 
-        if (!$this->load($output, $db)) {
+        if (!$this->load($db)) {
             return 1;
         }
 
@@ -75,18 +75,16 @@ class Maxmind extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     *
-     * @return int|resource
+     * @return string
      */
-    private function download(OutputInterface $output)
+    private function download()
     {
         $client = new HttpClient();
 
         // file download
-        $output->writeln('Downloading database');
+        $this->output->writeln('Downloading database');
 
-        $progress = new ProgressBar($output, 100);
+        $progress = new ProgressBar($this->output, 100);
         $progress->setMessage(0, 'currentsize');
         $progress->setMessage('???', 'totalsize');
         $progress->setFormat(
@@ -104,10 +102,7 @@ class Maxmind extends Command
                 $downloaded,
                 $upload_size,
                 $uploaded
-            ) use (
-                $progress,
-                $output
-) {
+            ) use ($progress) {
                 if ($download_size > 0) {
                     $progress->setMessage(round($downloaded / 1024 / 1024, 3), 'currentsize');
                     $progress->setMessage(round($download_size / 1024 / 1024, 3), 'totalsize');
@@ -118,28 +113,27 @@ class Maxmind extends Command
 
         $zipFile = $client->get('http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip');
         $progress->finish();
-        $output->write("\n");
+        $this->output->write("\n");
 
         if (strpos($zipFile->getBody(), "\n") === false) {
-            $output->writeln(sprintf("<error>Invalid zip with content '%s'</error>", $zipFile->getBody()));
+            $this->output->writeln(sprintf("<error>Invalid zip with content '%s'</error>", $zipFile->getBody()));
 
             return false;
         }
 
         $tmp = tempnam(sys_get_temp_dir(), 'maxmind');
         file_put_contents($tmp, $zipFile->getBody());
-        $output->writeln(sprintf("Created tmp file with csv at '%s'", $tmp), OutputInterface::VERBOSITY_VERBOSE);
+        $this->output->writeln(sprintf("Created tmp file with csv at '%s'", $tmp), OutputInterface::VERBOSITY_VERBOSE);
 
         return $tmp;
     }
 
     /**
-     * @param OutputInterface $output
      * @param string $zipFile
      *
      * @return bool
      */
-    private function normalize(OutputInterface $output, string $zipFile)
+    private function normalize(string $zipFile)
     {
         $zip = new \ZipArchive();
         $error = $zip->open($zipFile);
@@ -154,7 +148,7 @@ class Maxmind extends Command
                 }
             }
 
-            $output->writeln(sprintf("<error>Invalid zip '%s'</error>", $error));
+            $this->output->writeln(sprintf("<error>Invalid zip '%s'</error>", $error));
 
             return false;
         };
@@ -163,9 +157,9 @@ class Maxmind extends Command
             $file = $zip->statIndex($i);
 
             if (stripos($file['name'], '-Locations-') !== false) {
-                $this->readfile($output, $zip, $file, self::TYPE_LOCATION);
+                $this->readfile($zip, $file, self::TYPE_LOCATION);
             } elseif (stripos($file['name'], '-Blocks-IPv4.') !== false) {
-                $this->readfile($output, $zip, $file, self::TYPE_BLOCK);
+                $this->readfile($zip, $file, self::TYPE_BLOCK);
             }
         }
 
@@ -213,16 +207,15 @@ class Maxmind extends Command
     private $block = [];
 
     /**
-     * @param OutputInterface $output
      * @param \ZipArchive $zip
      * @param array $file
      * @param string $type
      *
      * @return bool
      */
-    private function readfile(OutputInterface $output, \ZipArchive $zip, array $file, string $type) : bool
+    private function readfile(\ZipArchive $zip, array $file, string $type) : bool
     {
-        $output->writeln('Reading ' . $file['name']);
+        $this->output->writeln('Reading ' . $file['name']);
 
         $lang = null;
         if ($type == self::TYPE_LOCATION) {
@@ -230,14 +223,14 @@ class Maxmind extends Command
             $lang = $matches[1];
         }
 
-        $progress = new ProgressBar($output, 100);
+        $progress = new ProgressBar($this->output, 100);
         $progress->setMessage(0, 'currentsize');
         $progress->setMessage(round($file['size'] / 1024 / 1024, 3), 'totalsize');
         $progress->setFormat(
             '<comment>[%bar%]</comment> %currentsize:7s% mo/%totalsize:7s% mo ' .
             '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
-        if ($output->isVerbose()) {
+        if ($this->output->isVerbose()) {
             $progress->start();
         }
 
@@ -247,7 +240,7 @@ class Maxmind extends Command
         while (($row = fgetcsv($handle, null, ',')) !== false) {
             $current = ftell($handle);
 
-            if ($output->isVerbose()) {
+            if ($this->output->isVerbose()) {
                 $progress->setMessage(round(ftell($handle) / 1024 / 1024, 3), 'currentsize');
                 $progress->setProgress(floor($current * 100 / $file['size']));
             }
@@ -311,29 +304,28 @@ class Maxmind extends Command
 
         fclose($handle);
 
-        if ($output->isVerbose()) {
+        if ($this->output->isVerbose()) {
             $progress->finish();
-            $output->write("\n");
+            $this->output->write("\n");
         }
 
         return true;
     }
 
     /**
-     * @param OutputInterface $output
      * @param TransactionDatabase $db
      *
      * @return bool
      */
-    private function load(OutputInterface $output, TransactionDatabase $db) : bool
+    private function load(TransactionDatabase $db) : bool
     {
         $db->startTransaction();
 
         $db->query('DELETE FROM tbl_geo_block');
         $db->query('DELETE FROM tbl_geo_location');
 
-        $this->loadTable($output, $db, self::TYPE_LOCATION);
-        $this->loadTable($output, $db, self::TYPE_BLOCK);
+        $this->loadTable($db, self::TYPE_LOCATION);
+        $this->loadTable($db, self::TYPE_BLOCK);
 
         $db->commit();
 
@@ -341,19 +333,18 @@ class Maxmind extends Command
     }
 
     /**
-     * @param OutputInterface $output
      * @param TransactionDatabase $db
      * @param string $type
      *
      * @return bool
      */
-    private function loadTable(OutputInterface $output, TransactionDatabase $db, string $type) : bool
+    private function loadTable(TransactionDatabase $db, string $type) : bool
     {
         $type = strtolower($type);
         $insertSize = 5000;
         $insertTotal = sizeof($this->$type);
 
-        $output->writeln('Loading ' . $type);
+        $this->output->writeln('Loading ' . $type);
 
         $sql = 'INSERT INTO tbl_geo_' . strtolower($type);
         $sql .= '(' . implode(', ', constant('self::' . strtoupper($type) . '_COLUMNS')) . ')';
@@ -368,14 +359,14 @@ class Maxmind extends Command
 
         };
 
-        $progress = new ProgressBar($output, 100);
+        $progress = new ProgressBar($this->output, 100);
         $progress->setMessage(0, 'currentsize');
         $progress->setMessage($insertTotal, 'totalsize');
         $progress->setFormat(
             '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
             '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
-        if ($output->isVerbose()) {
+        if ($this->output->isVerbose()) {
             $progress->start();
         }
 
@@ -386,7 +377,7 @@ class Maxmind extends Command
                 $chunkSql .= '(' . implode(', ', $row) . '),';
             }
 
-            if ($output->isVerbose()) {
+            if ($this->output->isVerbose()) {
                 $progress->setMessage($insertSize * $i, 'currentsize');
                 $progress->setProgress(floor($insertSize * $i * 100 / $insertTotal));
             }
@@ -394,9 +385,9 @@ class Maxmind extends Command
             $db->query(substr($chunkSql, 0, -1));
         }
 
-        if ($output->isVerbose()) {
+        if ($this->output->isVerbose()) {
             $progress->finish();
-            $output->write("\n");
+            $this->output->write("\n");
         }
 
         return true;
