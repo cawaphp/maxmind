@@ -50,7 +50,7 @@ class Geo
     /**
      * @param string $ip
      *
-     * @return null|static
+     * @return $this|self|null
      */
     public static function getByIp(string $ip)
     {
