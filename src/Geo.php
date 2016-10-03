@@ -16,6 +16,7 @@ namespace Cawa\Maxmind;
 use Cawa\Db\DatabaseFactory;
 use Cawa\Maxmind\Models\Block;
 use Cawa\Maxmind\Models\Location;
+use Cawa\Net\Ip;
 
 class Geo
 {
@@ -52,8 +53,12 @@ class Geo
      *
      * @return $this|self|null
      */
-    public static function getByIp(string $ip)
+    public static function getByIp(string $ip = null)
     {
+        if (is_null($ip)) {
+            $ip = Ip::get();
+        }
+
         $db = self::db('MAXMIND');
 
         $sql = 'SELECT 
@@ -77,9 +82,10 @@ class Geo
                 (
                     SELECT *
                     FROM tbl_geo_block 
-                    WHERE block_start_ip > INET_ATON(:ip) 
+                    WHERE block_start_ip >= INET_ATON(:ip) 
                     LIMIT 1
-                ) AS r ON block_location_id = location_id';
+                ) AS r ON block_location_id = location_id
+                AND INET_ATON(:ip) <= block_end_ip';
         if ($result = $db->fetchOne($sql, ['ip' => $ip])) {
             $return = new static();
 
