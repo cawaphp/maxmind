@@ -51,7 +51,7 @@ class Block extends Model
     /**
      * @return string
      */
-    public function getPostalCode() : string
+    public function getPostalCode() : ?string
     {
         return $this->postalCode;
     }

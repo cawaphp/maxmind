@@ -51,7 +51,7 @@ class Location extends Model
     /**
      * @return string
      */
-    public function getCountry() : string
+    public function getCountry() : ?string
     {
         return $this->country;
     }
@@ -64,7 +64,7 @@ class Location extends Model
     /**
      * @return int
      */
-    public function getSubdivition1() : int
+    public function getSubdivition1() : ?int
     {
         return $this->subdivition1;
     }
@@ -77,7 +77,7 @@ class Location extends Model
     /**
      * @return int
      */
-    public function getSubdivition2() : int
+    public function getSubdivition2() : ?int
     {
         return $this->subdivition2;
     }
@@ -90,7 +90,7 @@ class Location extends Model
     /**
      * @return string
      */
-    public function getCity() : string
+    public function getCity() : ?string
     {
         return $this->city;
     }
@@ -103,7 +103,7 @@ class Location extends Model
     /**
      * @return int
      */
-    public function getMetro() : int
+    public function getMetro() : ?int
     {
         return $this->metro;
     }

@@ -18,6 +18,7 @@ use Cawa\Db\DatabaseFactory;
 use Cawa\Db\TransactionDatabase;
 use Cawa\HttpClient\Adapter\AbstractClient;
 use Cawa\HttpClient\HttpClient;
+use Cawa\Maxmind\Geo;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -52,7 +53,7 @@ class Maxmind extends Command
         $db = $input->getOption('db');
 
         if (!$db) {
-            $db = 'MAXMIND';
+            $db = Geo::class;
         }
 
         $db = self::db($db);

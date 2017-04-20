@@ -59,7 +59,7 @@ class Geo
             $ip = Ip::get();
         }
 
-        $db = self::db('MAXMIND');
+        $db = self::db(self::class);
 
         $sql = 'SELECT 
                     location_id,
