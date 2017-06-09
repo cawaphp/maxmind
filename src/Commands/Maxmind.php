@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types = 1);
+declare(strict_types = 1);
 
 namespace Cawa\Maxmind\Commands;
 
@@ -152,7 +152,7 @@ class Maxmind extends Command
             $this->output->writeln(sprintf("<error>Invalid zip '%s'</error>", $error));
 
             return false;
-        };
+        }
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $file = $zip->statIndex($i);
@@ -178,7 +178,7 @@ class Maxmind extends Command
         12 => 'location_timezone',
     ];
 
-    const BLOCK_COLUMNS  = [
+    const BLOCK_COLUMNS = [
         0 => 'block_start_ip',
         1 => 'block_end_ip',
         2 => 'block_network',
@@ -285,15 +285,15 @@ class Maxmind extends Command
 
                 if ($type == self::TYPE_LOCATION) {
                     if (!empty($row[2])) {
-                        $this->langFile['continent'][$lang][$row[2]] = $row[3]  ?: null;
+                        $this->langFile['continent'][$lang][$row[2]] = $row[3] ?: null;
                     }
 
                     if (!empty($row[4])) {
-                        $this->langFile['country'][$lang][$row[4]] = $row[5]  ?: null;
+                        $this->langFile['country'][$lang][$row[4]] = $row[5] ?: null;
                     }
 
                     if (!empty($row[4]) && !empty($row[6])) {
-                        $this->langFile['subdivision'][$lang][$row[4]]['division1'][$row[6]] = $row[7]  ?: null;
+                        $this->langFile['subdivision'][$lang][$row[4]]['division1'][$row[6]] = $row[7] ?: null;
                     }
 
                     if (!empty($row[4]) && !empty($row[6]) && !empty($row[8])) {
@@ -357,7 +357,6 @@ class Maxmind extends Command
             } elseif (!is_numeric($col)) {
                 $col = "'" . str_replace("'", "\\'", $col) . "'";
             }
-
         };
 
         $progress = new ProgressBar($this->output, 100);

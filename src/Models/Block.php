@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types = 1);
+declare(strict_types = 1);
 
 namespace Cawa\Maxmind\Models;
 
@@ -87,7 +87,7 @@ class Block extends Model
      */
     public function map(array $result)
     {
-        $this->anonymousProxy = (bool) $result['block_anonymous_proxy'] ;
+        $this->anonymousProxy = (bool) $result['block_anonymous_proxy'];
         $this->satelliteProvider = (bool) $result['block_satellite_provider'];
         $this->postalCode = $result['block_postal_code'];
         $this->latitude = $result['block_latitude'];
