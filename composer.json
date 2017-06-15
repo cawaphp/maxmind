@@ -19,14 +19,11 @@
         }
     },
     "require": {
-        "php": "~7.0",
+        "php": "~7.1",
         "ext-zip": "*",
         "cawaphp/cawa" : "dev-master",
         "cawaphp/console" : "dev-master",
         "cawaphp/httpclient" : "dev-master",
         "cawaphp/orm": "dev-master"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~5.5"
     }
 }

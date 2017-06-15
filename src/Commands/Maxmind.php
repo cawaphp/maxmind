@@ -18,6 +18,7 @@ use Cawa\Db\DatabaseFactory;
 use Cawa\Db\TransactionDatabase;
 use Cawa\HttpClient\Adapter\AbstractClient;
 use Cawa\HttpClient\HttpClient;
+use Cawa\HttpClient\HttpClientFactory;
 use Cawa\Maxmind\Geo;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Maxmind extends Command
 {
     use DatabaseFactory;
+    use HttpClientFactory;
 
     const TYPE_BLOCK = 'BLOCK';
     const TYPE_LOCATION = 'LOCATION';
@@ -80,7 +82,7 @@ class Maxmind extends Command
      */
     private function download()
     {
-        $client = new HttpClient();
+        $client = self::httpClient(self::class);
 
         // file download
         $this->output->writeln('Downloading database');
@@ -92,7 +94,9 @@ class Maxmind extends Command
             '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
             '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
-        $progress->start();
+        if ($this->output->isVerbose()) {
+            $progress->start();
+        }
 
         $client->getClient()
             ->setOption(AbstractClient::OPTIONS_TIMEOUT, false)
@@ -104,7 +108,7 @@ class Maxmind extends Command
                 $upload_size,
                 $uploaded
             ) use ($progress) {
-                if ($download_size > 0) {
+                if ($download_size > 0 && $this->output->isVerbose()) {
                     $progress->setMessage(round($downloaded / 1024 / 1024, 3), 'currentsize');
                     $progress->setMessage(round($download_size / 1024 / 1024, 3), 'totalsize');
 
@@ -113,8 +117,11 @@ class Maxmind extends Command
             });
 
         $zipFile = $client->get('http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip');
-        $progress->finish();
-        $this->output->write("\n");
+
+        if ($this->output->isVerbose()) {
+            $progress->finish();
+            $this->output->write("\n");
+        }
 
         if (strpos($zipFile->getBody(), "\n") === false) {
             $this->output->writeln(sprintf("<error>Invalid zip with content '%s'</error>", $zipFile->getBody()));
@@ -366,6 +373,7 @@ class Maxmind extends Command
             '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
             '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
         );
+
         if ($this->output->isVerbose()) {
             $progress->start();
         }
