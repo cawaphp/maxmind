@@ -88,7 +88,7 @@ class Maxmind extends Command
         $this->output->writeln('Downloading database');
 
         $progress = new ProgressBar($this->output, 100);
-        $progress->setMessage(0, 'currentsize');
+        $progress->setMessage('0', 'currentsize');
         $progress->setMessage('???', 'totalsize');
         $progress->setFormat(
             '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
@@ -109,10 +109,10 @@ class Maxmind extends Command
                 $uploaded
             ) use ($progress) {
                 if ($download_size > 0 && $this->output->isVerbose()) {
-                    $progress->setMessage(round($downloaded / 1024 / 1024, 3), 'currentsize');
-                    $progress->setMessage(round($download_size / 1024 / 1024, 3), 'totalsize');
+                    $progress->setMessage((string) round($downloaded / 1024 / 1024, 3), 'currentsize');
+                    $progress->setMessage((string) round($download_size / 1024 / 1024, 3), 'totalsize');
 
-                    $progress->setProgress(floor($downloaded * 100 / $download_size));
+                    $progress->setProgress((int) floor($downloaded * 100 / $download_size));
                 }
             });
 
@@ -232,8 +232,8 @@ class Maxmind extends Command
         }
 
         $progress = new ProgressBar($this->output, 100);
-        $progress->setMessage(0, 'currentsize');
-        $progress->setMessage(round($file['size'] / 1024 / 1024, 3), 'totalsize');
+        $progress->setMessage((string) 0, 'currentsize');
+        $progress->setMessage((string) round($file['size'] / 1024 / 1024, 3), 'totalsize');
         $progress->setFormat(
             '<comment>[%bar%]</comment> %currentsize:7s% mo/%totalsize:7s% mo ' .
             '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
@@ -249,8 +249,8 @@ class Maxmind extends Command
             $current = ftell($handle);
 
             if ($this->output->isVerbose()) {
-                $progress->setMessage(round(ftell($handle) / 1024 / 1024, 3), 'currentsize');
-                $progress->setProgress(floor($current * 100 / $file['size']));
+                $progress->setMessage((string) round(ftell($handle) / 1024 / 1024, 3), 'currentsize');
+                $progress->setProgress((int) floor($current * 100 / $file['size']));
             }
 
             // avoid first line
@@ -367,8 +367,8 @@ class Maxmind extends Command
         };
 
         $progress = new ProgressBar($this->output, 100);
-        $progress->setMessage(0, 'currentsize');
-        $progress->setMessage($insertTotal, 'totalsize');
+        $progress->setMessage((string) 0, 'currentsize');
+        $progress->setMessage((string) $insertTotal, 'totalsize');
         $progress->setFormat(
             '<comment>[%bar%]</comment> %currentsize:6s% mo/%totalsize:6s% mo ' .
             '<info>%percent:3s%%</info> %elapsed:6s%/%estimated:-6s%'
@@ -386,8 +386,8 @@ class Maxmind extends Command
             }
 
             if ($this->output->isVerbose()) {
-                $progress->setMessage($insertSize * $i, 'currentsize');
-                $progress->setProgress(floor($insertSize * $i * 100 / $insertTotal));
+                $progress->setMessage((string) ($insertSize * $i), 'currentsize');
+                $progress->setProgress((int) floor($insertSize * $i * 100 / $insertTotal));
             }
 
             $db->query(substr($chunkSql, 0, -1));
